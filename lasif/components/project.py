@@ -42,8 +42,9 @@ class Project(Component):
 
     It represents the heart of LASIF.
     """
+
     def __init__(self, project_root_path: pathlib.Path,
-                 init_project: bool=False):
+                 init_project: bool = False):
         """
         Upon intialization, set the paths and read the config file.
 
@@ -166,8 +167,8 @@ class Project(Component):
 
         # Weights
         WeightsComponent(weights_folder=self.paths["weights"],
-                            communicator=self.comm,
-                            component_name="weights")
+                         communicator=self.comm,
+                         component_name="weights")
 
         # Iterations
         IterationsComponent(communicator=self.comm,
@@ -181,7 +182,6 @@ class Project(Component):
                          component_name="actions")
         ValidatorComponent(communicator=self.comm,
                            component_name="validator")
-
         WindowsAndAdjointSourcesComponent(
             folder=self.paths["adjoint_sources"],
             communicator=self.comm,
@@ -232,6 +232,7 @@ class Project(Component):
         """
         Updates the folder structure of the project.
         """
+
         def __update_folder_structure_recursion(paths):
             for name, path in paths.items():
                 if isinstance(path, dict):
@@ -252,28 +253,35 @@ class Project(Component):
         if not project_name:
             project_name = "LASIFProject"
 
-        lasif_config_str = f"# Please fill in this config file before proceeding with using LASIF. \n \n" \
+        lasif_config_str = f"# Please fill in this config file before " \
+                           f"proceeding with using LASIF. \n \n" \
                            f"[lasif_project]\n" \
                            f"  project_name = \"{project_name}\"\n" \
                            f"  description = \"\"\n\n" \
-                           f"  # Name of the exodus file used for the simulation. Without a mesh file, LASIF" \
+                           f"  # Name of the exodus file used for the " \
+                           f"simulation. Without a mesh file, LASIF" \
                            f" will not work.\n" \
                            f"  mesh_file = \"\"\n\n" \
                            f"  [lasif_project.download_settings]\n" \
                            f"    seconds_before_event = 300.0\n" \
                            f"    seconds_after_event = 3600.0\n" \
                            f"    interstation_distance_in_meters = 1000.0\n" \
-                           f"    channel_priorities = [ \"BH[Z,N,E]\", \"LH[Z,N,E]\", " \
-                           f"    \"HH[Z,N,E]\", \"EH[Z,N,E]\", \"MH[Z,N,E]\",]\n" \
-                           f"    location_priorities = [ \"\", \"00\", \"10\", \"20\", \"01\", \"02\",]\n" \
+                           f"    channel_priorities = [ \"BH[Z,N,E]\", " \
+                           f"\"LH[Z,N,E]\", " \
+                           f"    \"HH[Z,N,E]\", \"EH[Z,N,E]\", " \
+                           f"\"MH[Z,N,E]\",]\n" \
+                           f"    location_priorities = " \
+                           f"[ \"\", \"00\", \"10\", \"20\"," \
+                           f" \"01\", \"02\",]\n" \
                            f"\n"
 
         data_preproc_str = "# Data processing settings. High- and low-pass period are given in seconds.\n" \
                            "[data_processing]\n" \
                            "  highpass_period = 30.0\n" \
                            "  lowpass_period = 50.0\n\n" \
-                           "  # You most likely want to keep this setting at true.\n" \
-                           "  scale_data_to_synthetics = true\n\n" \
+                           "  # You most likely want to keep this" \
+                           " setting at true.\n" \
+                           "  scale_data_to_synthetics = true\n\n"
 
         solver_par_str = "[solver_settings]\n" \
                          "  [solver_settings.simulation_parameters]\n" \
@@ -288,10 +296,13 @@ class Project(Component):
                          "    number_of_processors = 4\n" \
                          "    salvus_call = \"mpirun -n 4\"\n" \
                          "    with_anisotropy = true\n\n" \
-                         "    # Source time function type, currently \"delta\" and \"ricker\" are supported \n" \
-                         "    # When a ricker wavelet is used, please provide the center frequency.\n" \
-                         "    source_time_function_type = \"delta\"\n"  \
-                         "    source_center_frequency = 0.025\n\n" \
+                         "    # Source time function type, " \
+                         "currently \"delta\" and \"ricker\" are" \
+                         " supported \n" \
+                         "    # When a ricker wavelet is used, " \
+                         "please provide the center frequency.\n" \
+                         "    source_time_function_type = \"delta\"\n" \
+                         "    source_center_frequency = 0.025\n\n"
 
         lasif_config_str += data_preproc_str + solver_par_str
 
@@ -327,9 +338,8 @@ class Project(Component):
         if not os.path.exists(filename):
             msg = "No file '%s' in existence." % filename
             raise LASIFNotFoundError(msg)
-        fct_template = importlib.machinery.SourceFileLoader("_lasif_fct_template", filename).\
-            load_module("_lasif_fct_template")
-        #fct_template = imp.load_source("_lasif_fct_template", filename)
+        fct_template = importlib.machinery.SourceFileLoader(
+            "_lasif_fct_template", filename).load_module("_lasif_fct_template")
 
         try:
             fct = getattr(fct_template, fct_type)
