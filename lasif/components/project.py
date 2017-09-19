@@ -86,11 +86,12 @@ class Project(Component):
         Pretty string representation.
         """
         # Count all files and sizes.
-        ret_str = "LASIF project \"%s\"\n" % self.config["project_name"]
-        ret_str += "\tDescription: %s\n" % self.config["description"]
-        ret_str += "\tProject root: %s\n" % self.paths["root"]
-        ret_str += "\tContent:\n"
-        ret_str += "\t\t%i events\n" % self.comm.events.count()
+        ret_str = f"LASIF project \"{self.config['project_name']}\"\n"
+        ret_str += f"\tDescription: {self.config['description']}\n"
+        ret_str += f"\tProject root: {self.paths['root']}\n"
+        ret_str += f"\tContent:\n"
+        ret_str += f"\t\t{self.comm.events.count()} events\n"
+        ret_str += f"\t\t{self.comm.reference_stations.count()} reference stations\n"
 
         return ret_str
 
@@ -145,15 +146,30 @@ class Project(Component):
         Communication will happen through the communicator which will also
         keep the references to the single components.
         """
-        # Basic components.
-        EventsComponent(folder=self.paths["eq_data"], communicator=self.comm,
+        # Earthquakes
+        EventsComponent(folder=self.paths["data"]["earthquakes"],
+                        communicator=self.comm,
                         component_name="events")
-        WaveformsComponent(data_folder=self.paths["eq_data"], preproc_data_folder=self.paths["preproc_eq_data"],
-                           synthetics_folder=self.paths["eq_synthetics"],
+        WaveformsComponent(data_folder=self.paths["data"]["earthquakes"],
+                           preproc_data_folder=self.paths["preprocessed"]["earthquakes"],
+                           synthetics_folder=self.paths["synthetics"]["earthquakes"],
                            communicator=self.comm, component_name="waveforms")
+
+        # Correlations
+        EventsComponent(folder=self.paths["data"]["correlations"],
+                        communicator=self.comm,
+                        component_name="reference_stations")
+        WaveformsComponent(data_folder=self.paths["data"]["correlations"],
+                           preproc_data_folder=self.paths["preprocessed"]["correlations"],
+                           synthetics_folder=self.paths["synthetics"]["correlations"],
+                           communicator=self.comm, component_name="correlations")
+
+        # Weights
         WeightsComponent(weights_folder=self.paths["weights"],
                             communicator=self.comm,
                             component_name="weights")
+
+        # Iterations
         IterationsComponent(communicator=self.comm,
                             component_name="iterations")
 
@@ -185,25 +201,25 @@ class Project(Component):
         self.paths["root"] = root_path
 
         # Data
-        self.paths["data"] = root_path / "DATA"
-        self.paths["corr_data"] = root_path / "DATA" / "CORRELATIONS"
-        self.paths["eq_data"] = root_path / "DATA" / "EARTHQUAKES"
+        self.paths["data"] = dict()
+        self.paths["data"]["correlations"] = root_path / "DATA" / "CORRELATIONS"
+        self.paths["data"]["earthquakes"] = root_path / "DATA" / "EARTHQUAKES"
 
-        self.paths["synthetics"] = root_path / "SYNTHETICS"
-        self.paths["corr_synthetics"] = root_path / "SYNTHETICS" / "CORRELATIONS"
-        self.paths["eq_synthetics"] = root_path / "SYNTHETICS" / "EARTHQUAKES"
+        self.paths["synthetics"] = dict()
+        self.paths["synthetics"]["correlations"] = root_path / "SYNTHETICS" / "CORRELATIONS"
+        self.paths["synthetics"]["earthquakes"] = root_path / "SYNTHETICS" / "EARTHQUAKES"
 
-        self.paths["preproc_data"] = root_path / "PROCESSED_DATA"
-        self.paths["preproc_eq_data"] = root_path / "PROCESSED_DATA" / "EARTHQUAKES"
-        self.paths["preproc_corr_data"] = root_path / "PROCESSED_DATA" / "CORRELATIONS"
+        self.paths["preprocessed"] = dict()
+        self.paths["preprocessed"]["correlations"] = root_path / "PROCESSED_DATA" / "CORRELATIONS"
+        self.paths["preprocessed"]["earthquakes"] = root_path / "PROCESSED_DATA" / "EARTHQUAKES"
 
         self.paths["sets"] = root_path / "SETS"
-        self.paths["windows"] = root_path / "SETS" / "WINDOWS"
-        self.paths["weights"] = root_path / "SETS" / "WEIGHTS"
+        self.paths["windows"] = self.paths["sets"] / "WINDOWS"
+        self.paths["weights"] = self.paths["sets"] / "WEIGHTS"
 
         self.paths["adjoint_sources"] = root_path / "ADJOINT_SOURCES"
         self.paths["output"] = root_path / "OUTPUT"
-        self.paths["logs"] = root_path / "OUTPUT" / "LOGS"
+        self.paths["logs"] = self.paths["output"] / "LOGS"
         self.paths["salvus_input"] = root_path / "SALVUS_INPUT_FILES"
 
         # Path for the custom functions.
@@ -216,10 +232,16 @@ class Project(Component):
         """
         Updates the folder structure of the project.
         """
-        for name, path in self.paths.items():
-            if "file" in name or path.exists():
-                continue
-            os.makedirs(path)
+        def __update_folder_structure_recursion(paths):
+            for name, path in paths.items():
+                if isinstance(path, dict):
+                    __update_folder_structure_recursion(paths=path)
+                    continue
+                if "file" in name or path.exists():
+                    continue
+                os.makedirs(path)
+
+        __update_folder_structure_recursion(self.paths)
 
     def __init_new_project(self, project_name):
         """
@@ -246,7 +268,7 @@ class Project(Component):
                            f"    location_priorities = [ \"\", \"00\", \"10\", \"20\", \"01\", \"02\",]\n" \
                            f"\n"
 
-        data_preproc_str = "# Data processing settings,. high- and lowpass period are given in seconds.\n" \
+        data_preproc_str = "# Data processing settings. High- and low-pass period are given in seconds.\n" \
                            "[data_processing]\n" \
                            "  highpass_period = 30.0\n" \
                            "  lowpass_period = 50.0\n\n" \

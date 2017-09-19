@@ -44,7 +44,7 @@ class ActionsComponent(Component):
             """
             # Loop over the chosen events.
             for event_name in events:
-                output_folder = os.path.join(self.comm.project.paths["preproc_eq_data"], event_name)
+                output_folder = os.path.join(self.comm.project.paths["preprocessed"]["earthquakes"], event_name)
 
                 if not os.path.exists(output_folder):
                     os.makedirs(output_folder)

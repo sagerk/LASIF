@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import glob
 import os
+import re
 
 from .component import Component
 import shutil
@@ -30,8 +31,8 @@ class IterationsComponent(Component):
         'ITERATION_1'
         """
 
-        iteration_name = iteration_name.lstrip("ITERATION_")
-        return "ITERATION_%s" % iteration_name
+        iteration_name = re.sub('^ITERATION_', '', iteration_name, flags=re.IGNORECASE)
+        return f"ITERATION_{iteration_name}"
 
     def setup_directories_for_iteration(self, iteration_name, remove_dirs=False):
         """
@@ -49,13 +50,12 @@ class IterationsComponent(Component):
         Create the synthetics folder if it does not yet exist.
         :param iteration_name: The iteration for which to create the folders.
         """
-        path = self.comm.project.paths["eq_synthetics"]
-
-        folder = os.path.join(path, long_iteration_name)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        if remove_dirs:
-            shutil.rmtree(folder)
+        for _, path in self.comm.project.paths["synthetics"].items():
+            folder = os.path.join(path, long_iteration_name)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            if remove_dirs:
+                shutil.rmtree(folder)
 
     def _create_input_files_folder_for_iteration(self, long_iteration_name, remove_dirs=False):
         """
@@ -88,7 +88,7 @@ class IterationsComponent(Component):
         Returns a list of all the iterations known to LASIF.
         """
         files = [os.path.abspath(_i) for _i in glob.iglob(os.path.join(
-            self.comm.project.paths["eq_synthetics"], "ITERATION_*"))]
+            self.comm.project.paths["synthetics"]["earthquakes"], "ITERATION_*"))]
         iterations = [os.path.splitext(os.path.basename(_i))[0][10:]
                        for _i in files]
         return sorted(iterations)
@@ -97,7 +97,7 @@ class IterationsComponent(Component):
         """
         Checks for existance of an iteration
         """
-        iteration_name = iteration_name.lstrip("ITERATION_")
+        iteration_name = re.sub('^ITERATION_', '', iteration_name, flags=re.IGNORECASE)
         if iteration_name in self.list():
             return True
         return False

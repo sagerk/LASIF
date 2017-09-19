@@ -277,7 +277,7 @@ def lasif_add_spud_event(parser, args):
     from lasif.scripts.iris2quakeml import iris2quakeml
 
     comm = _find_project_comm(".")
-    iris2quakeml(url, comm.project.paths["eq_data"])
+    iris2quakeml(url, comm.project.paths["data"]["earthquakes"])
 
 
 @command_group("Data Acquisition")
@@ -487,11 +487,11 @@ def lasif_init_project(parser, args):
     args = parser.parse_args(args)
     folder_path = pathlib.Path(args.folder_path).absolute()
 
-    if folder_path.exists():
-        msg = "The given FOLDER_PATH already exists. It must not exist yet."
-        raise LASIFCommandLineException(msg)
+    # if folder_path.exists():
+    #     msg = "The given FOLDER_PATH already exists. It must not exist yet."
+    #     raise LASIFCommandLineException(msg)
     try:
-        os.makedirs(folder_path)
+        os.makedirs(folder_path, exist_ok=True)
     except:
         msg = f"Failed creating directory {folder_path}. Permissions?"
         raise LASIFCommandLineException(msg)
@@ -702,7 +702,8 @@ def lasif_list_iterations(parser, args):
     iterations = comm.iterations.list()
     print("Iterations known to LASIF: \n")
     for iteration in iterations:
-        print(comm.iterations.get_long_iteration_name(iteration), "\n")
+        print(comm.iterations.get_long_iteration_name(iteration))
+    print("\n")
 
 @mpi_enabled
 @command_group("Iteration Management")
