@@ -112,9 +112,9 @@ class Project(Component):
             if not new_filename.exists():
                 if not init_project:
                     warnings.warn(
-                        "Function template '{filename.name}' did not exist. "
-                        "It does now. Did you update a later LASIF version? "
-                        "Please make sure you are aware of the changes.",
+                        f"Function template '{filename.name}' did not exist. "
+                        f"It does now. Did you update a later LASIF version? "
+                        f"Please make sure you are aware of the changes.",
                         LASIFWarning)
                 import shutil
                 shutil.copy(src=filename, dst=new_filename)
@@ -133,7 +133,8 @@ class Project(Component):
         self.computational_setup = self.solver_settings["computational_setup"]
         self.processing_params = config_dict["data_processing"]
 
-        self.domain = lasif.domain.ExodusDomain(self.config['mesh_file'])
+        self.domain = lasif.domain.ExodusDomain(
+            self.config["mesh_file"], self.config["num_buffer_elements"])
 
     def get_communicator(self):
         return self.__comm
@@ -262,6 +263,11 @@ class Project(Component):
                            f"simulation. Without a mesh file, LASIF" \
                            f" will not work.\n" \
                            f"  mesh_file = \"\"\n\n" \
+                           f"  # Number of buffer elements at the domain" \
+                           f" edges, no events or receivers will be placed" \
+                           f" there.\n" \
+                           f"  # A minimum amount of 3 is advised.\n" \
+                           f"  num_buffer_elements = 8\n\n" \
                            f"  [lasif_project.download_settings]\n" \
                            f"    seconds_before_event = 300.0\n" \
                            f"    seconds_after_event = 3600.0\n" \
