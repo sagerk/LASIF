@@ -181,10 +181,10 @@ class ActionsComponent(Component):
                 windows = all_windows[station][data_tr.id]
                 try:
                     for starttime, endtime in windows:
-                        asrc = \
-                            self.comm. \
-                                wins_and_adj_sources.calculate_adjoint_source(
-                                data=data_tr, synth=synth_tr,
+                        asrc = self.comm. \
+                            wins_and_adj_sources.calculate_adjoint_source(
+                                data=data_tr,
+                                synth=synth_tr,
                                 starttime=starttime, endtime=endtime,
                                 taper="hann", taper_percentage=0.05,
                                 min_period=process_params["highpass_period"],
@@ -430,10 +430,10 @@ class ActionsComponent(Component):
             inv += ds.waveforms[station].StationXML
 
         import salvus_seismo
-        src = salvus_seismo.Source.parse(
-            event,
-            sliprate=self.comm.
-                project.computational_setup['source_time_function_type'])
+        src = salvus_seismo.Source. \
+            parse(event,
+                  sliprate=self.comm.project.
+                  computational_setup['source_time_function_type'])
         recs = salvus_seismo.Receiver.parse(inv)
 
         solver_settings = self.comm.project.solver_settings
@@ -556,8 +556,9 @@ class ActionsComponent(Component):
                         continue
                     # Final adjoint source for that channel and apply all
                     # weights.
-                    adjoint_source = np.sum(srcs, axis=0) / channel_weight * \
-                                     event_weight * station_weight
+                    adjoint_source = \
+                        np.sum(srcs, axis=0) / channel_weight * \
+                        event_weight * station_weight
                     channels[w.channel_id[-1]] = adjoint_source
             except LASIFError as e:
                 print("Could not calculate adjoint source for iteration %s "

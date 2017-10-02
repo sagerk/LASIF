@@ -22,6 +22,7 @@ import warnings
 
 import lasif.domain
 from lasif import LASIFError, LASIFNotFoundError, LASIFWarning
+
 from .actions import ActionsComponent
 from .communicator import Communicator
 from .component import Component
@@ -92,7 +93,8 @@ class Project(Component):
         ret_str += f"\tProject root: {self.paths['root']}\n"
         ret_str += f"\tContent:\n"
         ret_str += f"\t\t{self.comm.events.count()} events\n"
-        ret_str += f"\t\t{self.comm.reference_stations.count()} reference stations\n"
+        ret_str += f"\t\t{self.comm.reference_stations.count()} " \
+                   f"reference stations\n"
 
         return ret_str
 
@@ -153,8 +155,10 @@ class Project(Component):
                         communicator=self.comm,
                         component_name="events")
         WaveformsComponent(data_folder=self.paths["data"]["earthquakes"],
-                           preproc_data_folder=self.paths["preprocessed"]["earthquakes"],
-                           synthetics_folder=self.paths["synthetics"]["earthquakes"],
+                           preproc_data_folder=self.paths["preprocessed"][
+                               "earthquakes"],
+                           synthetics_folder=self.paths["synthetics"][
+                               "earthquakes"],
                            communicator=self.comm, component_name="waveforms")
 
         # Correlations
@@ -162,9 +166,12 @@ class Project(Component):
                         communicator=self.comm,
                         component_name="reference_stations")
         WaveformsComponent(data_folder=self.paths["data"]["correlations"],
-                           preproc_data_folder=self.paths["preprocessed"]["correlations"],
-                           synthetics_folder=self.paths["synthetics"]["correlations"],
-                           communicator=self.comm, component_name="correlations")
+                           preproc_data_folder=self.paths["preprocessed"][
+                               "correlations"],
+                           synthetics_folder=self.paths["synthetics"][
+                               "correlations"],
+                           communicator=self.comm,
+                           component_name="correlations")
 
         # Weights
         WeightsComponent(weights_folder=self.paths["weights"],
@@ -203,16 +210,21 @@ class Project(Component):
 
         # Data
         self.paths["data"] = dict()
-        self.paths["data"]["correlations"] = root_path / "DATA" / "CORRELATIONS"
+        self.paths["data"][
+            "correlations"] = root_path / "DATA" / "CORRELATIONS"
         self.paths["data"]["earthquakes"] = root_path / "DATA" / "EARTHQUAKES"
 
         self.paths["synthetics"] = dict()
-        self.paths["synthetics"]["correlations"] = root_path / "SYNTHETICS" / "CORRELATIONS"
-        self.paths["synthetics"]["earthquakes"] = root_path / "SYNTHETICS" / "EARTHQUAKES"
+        self.paths["synthetics"][
+            "correlations"] = root_path / "SYNTHETICS" / "CORRELATIONS"
+        self.paths["synthetics"][
+            "earthquakes"] = root_path / "SYNTHETICS" / "EARTHQUAKES"
 
         self.paths["preprocessed"] = dict()
-        self.paths["preprocessed"]["correlations"] = root_path / "PROCESSED_DATA" / "CORRELATIONS"
-        self.paths["preprocessed"]["earthquakes"] = root_path / "PROCESSED_DATA" / "EARTHQUAKES"
+        self.paths["preprocessed"][
+            "correlations"] = root_path / "PROCESSED_DATA" / "CORRELATIONS"
+        self.paths["preprocessed"][
+            "earthquakes"] = root_path / "PROCESSED_DATA" / "EARTHQUAKES"
 
         self.paths["sets"] = root_path / "SETS"
         self.paths["windows"] = self.paths["sets"] / "WINDOWS"
@@ -281,7 +293,8 @@ class Project(Component):
                            f" \"01\", \"02\",]\n" \
                            f"\n"
 
-        data_preproc_str = "# Data processing settings. High- and low-pass period are given in seconds.\n" \
+        data_preproc_str = "# Data processing settings. High- and low-pass " \
+                           "period are given in seconds.\n" \
                            "[data_processing]\n" \
                            "  highpass_period = 30.0\n" \
                            "  lowpass_period = 50.0\n\n" \

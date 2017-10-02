@@ -31,7 +31,8 @@ class IterationsComponent(Component):
         'ITERATION_1'
         """
 
-        iteration_name = re.sub('^ITERATION_', '', iteration_name, flags=re.IGNORECASE)
+        iteration_name = re.sub('^ITERATION_', '', iteration_name,
+                                flags=re.IGNORECASE)
         return f"ITERATION_{iteration_name}"
 
     def setup_directories_for_iteration(self, iteration_name,
@@ -95,7 +96,8 @@ class IterationsComponent(Component):
         Returns a list of all the iterations known to LASIF.
         """
         files = [os.path.abspath(_i) for _i in glob.iglob(os.path.join(
-            self.comm.project.paths["synthetics"]["earthquakes"], "ITERATION_*"))]
+            self.comm.project.paths["synthetics"]["earthquakes"],
+            "ITERATION_*"))]
         iterations = [os.path.splitext(os.path.basename(_i))[0][10:]
                       for _i in files]
         return sorted(iterations)
@@ -104,7 +106,8 @@ class IterationsComponent(Component):
         """
         Checks for existance of an iteration
         """
-        iteration_name = re.sub('^ITERATION_', '', iteration_name, flags=re.IGNORECASE)
+        iteration_name = re.sub('^ITERATION_', '', iteration_name,
+                                flags=re.IGNORECASE)
         if iteration_name in self.list():
             return True
         return False

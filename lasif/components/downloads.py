@@ -46,7 +46,8 @@ class DownloadsComponent(Component):
             location_priorities=ds["location_priorities"],
             channel_priorities=ds["channel_priorities"])
 
-        filename = proj.paths["data"]["earthquakes"] / (event["event_name"] + ".h5")
+        filename = \
+            proj.paths["data"]["earthquakes"] / (event["event_name"] + ".h5")
 
         import pyasdf
         asdf_ds = pyasdf.ASDFDataSet(filename, compression="gzip-3")
