@@ -42,9 +42,8 @@ should scale fairly well and makes it trivial to add new methods.
 """
 import os
 
-import progressbar
-
 import lasif
+import progressbar
 from lasif import LASIFError
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
@@ -73,9 +72,7 @@ except:
 else:
     warnings.filterwarnings("ignore", category=ObsPyDeprecationWarning)
 
-
 FCT_PREFIX = "lasif_"
-
 
 # Documentation for the subcommand groups. This will appear in the CLI
 # documentation.
@@ -111,9 +108,11 @@ def command_group(group_name):
     """
     Decorator to be able to logically group commands.
     """
+
     def wrapper(func):
         func.group_name = group_name
         return func
+
     return wrapper
 
 
@@ -240,9 +239,9 @@ def lasif_plot_events(parser, args):
     parser.add_argument("--type", default="map", choices=["map", "depth",
                                                           "time"],
                         help="the type of plot. "
-                        "``map``: beachballs on a map, "
-                        "``depth``: depth distribution histogram, "
-                        "``time``: time distribution histogram")
+                             "``map``: beachballs on a map, "
+                             "``depth``: depth distribution histogram, "
+                             "``time``: time distribution histogram")
     args = parser.parse_args(args)
     plot_type = args.type
 
@@ -356,22 +355,25 @@ def lasif_list_events(parser, args):
     comm = _find_project_comm(".")
 
     if args.list is False:
-        print("%i event%s in project:" % (comm.events.count(),
-              "s" if comm.events.count() != 1 else ""))
+        print("%i event%s in project:" %
+              (comm.events.count(),
+               "s" if comm.events.count() != 1 else ""))
 
     if args.list is True:
         for event in sorted(comm.events.list()):
             print(event)
     else:
-        tab = PrettyTable(["Event Name", "Lat/Lng/Depth(km)/Mag"])
-        tab.align["Event Name"] = "l"
-        for event in comm.events.list():
-            ev = comm.events.get(event)
-            tab.add_row([
-                event, "%6.1f / %6.1f / %3i / %3.1f" % (
-                    ev["latitude"], ev["longitude"], int(ev["depth_in_km"]),
-                    ev["magnitude"])])
-        print(tab)
+        if len(comm.events.list()) > 0:
+            tab = PrettyTable(["Event Name", "Lat/Lng/Depth(km)/Mag"])
+            tab.align["Event Name"] = "l"
+            for event in comm.events.list():
+                ev = comm.events.get(event)
+                tab.add_row([
+                    event, "%6.1f / %6.1f / %3i / %3.1f" % (
+                        ev["latitude"], ev["longitude"],
+                        int(ev["depth_in_km"]),
+                        ev["magnitude"])])
+            print(tab)
 
 
 @command_group("Event Management")
@@ -393,13 +395,13 @@ def lasif_event_info(parser, args):
 
     event_dict = comm.events.get(event_name)
 
-    print("Earthquake with %.1f %s at %s" % (
-          event_dict["magnitude"], event_dict["magnitude_type"],
-          event_dict["region"]))
+    # print("Earthquake with %.1f %s at %s" % (
+        # event_dict["magnitude"], event_dict["magnitude_type"],
+    print("Something at %s" % (event_dict["region"]))
     print("\tLatitude: %.3f, Longitude: %.3f, Depth: %.1f km" % (
-          event_dict["latitude"], event_dict["longitude"],
-          event_dict["depth_in_km"]))
-    print("\t%s UTC" % str(event_dict["origin_time"]))
+        event_dict["latitude"], event_dict["longitude"],
+        event_dict["depth_in_km"]))
+    # print("\t%s UTC" % str(event_dict["origin_time"]))
 
     try:
         stations = comm.query.get_all_stations_for_event(event_name)
@@ -474,9 +476,9 @@ def lasif_generate_input_files(parser, args):
 
     for _i, event in enumerate(events):
         if not comm.events.has_event(event):
-                print("Event '%s' not known to LASIF. "
-                      "No input files for this event"
-                      " will be generated. " % event)
+            print("Event '%s' not known to LASIF. "
+                  "No input files for this event"
+                  " will be generated. " % event)
         print("Generating input files for event %i of %i..." % (_i + 1,
                                                                 len(events)))
         comm.actions.generate_input_files(iteration_name, event)
@@ -632,7 +634,7 @@ def lasif_select_all_windows(parser, args):
                   "{reset}".format(green=colorama.Fore.GREEN,
                                    reset=colorama.Style.RESET_ALL))
             print("Starting window selection for event %i of %i..." % (
-                  _i + 1, len(events)))
+                _i + 1, len(events)))
             print("{green}"
                   "==========================================================="
                   "{reset}\n".format(green=colorama.Fore.GREEN,
@@ -905,7 +907,7 @@ def lasif_list_weight_sets(parser, args):
     it_len = comm.weights.count()
 
     print("%i weight set(s)%s in project:" % (it_len,
-          "s" if it_len != 1 else ""))
+                                              "s" if it_len != 1 else ""))
     for weights in comm.weights.list():
         print("\t%s" % weights)
 
@@ -1014,7 +1016,7 @@ def lasif_plot_windows(parser, args):
         window_manager = comm.windows.get(event_name, iteration_name)
         for window_group in window_manager:
             window_group.plot(show=False, filename=os.path.join(output_folder,
-                              "%s.png" % window_group.channel_id))
+                                                                "%s.png" % window_group.channel_id))
             sys.stdout.write(".")
             sys.stdout.flush()
         print("\nDone")
@@ -1048,14 +1050,15 @@ def lasif_validate_data(parser, args):
     parser.add_argument(
         "--station_file_availability",
         help="asserts that all waveform files have corresponding station "
-        "files. Very slow.",
+             "files. Very slow.",
         action="store_true")
     parser.add_argument(
         "--raypaths", help="assert that all raypaths are within the "
-        "set boundaries. Very slow.", action="store_true")
+                           "set boundaries. Very slow.", action="store_true")
     parser.add_argument(
         "--waveforms", help="asserts that waveforms for one event have only "
-        "a single location and channel type. Fast.", action="store_true")
+                            "a single location and channel type. Fast.",
+        action="store_true")
 
     parser.add_argument("--full", help="run all validations.",
                         action="store_true")
@@ -1176,13 +1179,13 @@ def _print_generic_help(fcts):
     header = ("{default_style}LASIF - Large Scale Seismic "
               "{inverted_style}Inversion"
               "{default_style} Framework{reset_style}  [Version {version}]"
-              .format(
-                  default_style=colorama.Style.BRIGHT + colorama.Fore.WHITE +
-                  colorama.Back.BLACK,
-                  inverted_style=colorama.Style.BRIGHT + colorama.Fore.BLACK +
-                  colorama.Back.WHITE,
-                  reset_style=colorama.Style.RESET_ALL,
-                  version=lasif.__version__))
+        .format(
+        default_style=colorama.Style.BRIGHT + colorama.Fore.WHITE +
+                      colorama.Back.BLACK,
+        inverted_style=colorama.Style.BRIGHT + colorama.Fore.BLACK +
+                       colorama.Back.WHITE,
+        reset_style=colorama.Style.RESET_ALL,
+        version=lasif.__version__))
     print("    " + header)
     print("    http://krischer.github.io/LASIF")
     print(100 * "#")
@@ -1204,9 +1207,9 @@ def _print_generic_help(fcts):
         current_fcts = fct_groups[group_name]
         for name in sorted(current_fcts.keys()):
             print("%s  %32s: %s%s%s" % (colorama.Fore.YELLOW, name,
-                  colorama.Fore.BLUE,
-                  _get_cmd_description(fcts[name]),
-                  colorama.Style.RESET_ALL))
+                                        colorama.Fore.BLUE,
+                                        _get_cmd_description(fcts[name]),
+                                        colorama.Style.RESET_ALL))
     print("\nTo get help for a specific function type")
     print("\tlasif help FUNCTION  or\n\tlasif FUNCTION --help")
 
@@ -1303,7 +1306,7 @@ def main():
     # Make sure that only MPI enabled functions are called with MPI.
     if MPI.COMM_WORLD.size > 1:
         if not hasattr(func, "_is_mpi_enabled") or \
-                func._is_mpi_enabled is not True:
+                        func._is_mpi_enabled is not True:
             if MPI.COMM_WORLD.rank != 0:
                 return
             sys.stderr.write("'lasif %s' must not be called with MPI.\n" %

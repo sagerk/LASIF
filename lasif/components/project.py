@@ -151,27 +151,27 @@ class Project(Component):
         keep the references to the single components.
         """
         # Earthquakes
-        EventsComponent(folder=self.paths["data"]["earthquakes"],
-                        communicator=self.comm,
-                        component_name="events")
-        WaveformsComponent(data_folder=self.paths["data"]["earthquakes"],
-                           preproc_data_folder=self.paths["preprocessed"][
-                               "earthquakes"],
-                           synthetics_folder=self.paths["synthetics"][
-                               "earthquakes"],
-                           communicator=self.comm, component_name="waveforms")
+        # EventsComponent(folder=self.paths["data"]["earthquakes"],
+        #                 communicator=self.comm,
+        #                 component_name="events")
+        # WaveformsComponent(data_folder=self.paths["data"]["earthquakes"],
+        #                    preproc_data_folder=self.paths["preprocessed"][
+        #                        "earthquakes"],
+        #                    synthetics_folder=self.paths["synthetics"][
+        #                        "earthquakes"],
+        #                    communicator=self.comm, component_name="waveforms")
 
         # Correlations
         EventsComponent(folder=self.paths["data"]["correlations"],
                         communicator=self.comm,
-                        component_name="reference_stations")
+                        component_name="events")
         WaveformsComponent(data_folder=self.paths["data"]["correlations"],
                            preproc_data_folder=self.paths["preprocessed"][
                                "correlations"],
                            synthetics_folder=self.paths["synthetics"][
                                "correlations"],
                            communicator=self.comm,
-                           component_name="correlations")
+                           component_name="waveforms")
 
         # Weights
         WeightsComponent(weights_folder=self.paths["weights"],

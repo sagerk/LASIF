@@ -107,7 +107,7 @@ def process_synthetics(st, processing_params, event):  # NOQA
         # transform data back into the time domain
         data = np.fft.irfft(data)[0:orig_len]
 
-        # assign processed data and store processing informatio
+        # assign processed data and store processing information
         tr.data = data
 
         tr.detrend("linear")
