@@ -1081,84 +1081,84 @@ def lasif_validate_data(parser, args):
         raypaths=raypaths, waveforms=waveforms)
 
 
-def lasif_tutorial(parser, args):
-    """
-    Open the tutorial in a webbrowser.
-    """
-    parser.parse_args(args)
-
-    import webbrowser
-    webbrowser.open("http://krischer.github.io/LASIF/")
-
-
-def lasif_debug(parser, args):
-    """
-    Print information LASIF can gather from a list of files.
-    """
-    parser.add_argument(
-        "files", help="filenames to print debug information about", nargs="+")
-    args = parser.parse_args(args)
-    comm = _find_project_comm(".")
-
-    for filename in args.files:
-        filename = os.path.relpath(filename)
-        if not os.path.exists(filename):
-            print("{red}Path '{f}' does not exist.{reset}\n".format(
-                f=filename, red=colorama.Fore.RED,
-                reset=colorama.Style.RESET_ALL))
-            continue
-        print("{green}Path '{f}':{reset}".format(
-            f=filename, green=colorama.Fore.GREEN,
-            reset=colorama.Style.RESET_ALL))
-
-        try:
-            info = comm.query.what_is(filename)
-        except LASIFError as e:
-            info = "Error: %s" % e.message
-
-        print("\t" + info)
-        print("")
+# def lasif_tutorial(parser, args):
+#     """
+#     Open the tutorial in a webbrowser.
+#     """
+#     parser.parse_args(args)
+#
+#     import webbrowser
+#     webbrowser.open("http://krischer.github.io/LASIF/")
 
 
-@command_group("Misc")
-def lasif_serve(parser, args):
-    """
-    Launches the LASIF webinterface.
-    """
-    parser.add_argument("--port", default=8008, type=int,
-                        help="Port of the webserver.")
+# def lasif_debug(parser, args):
+#     """
+#     Print information LASIF can gather from a list of files.
+#     """
+#     parser.add_argument(
+#         "files", help="filenames to print debug information about", nargs="+")
+#     args = parser.parse_args(args)
+#     comm = _find_project_comm(".")
+#
+#     for filename in args.files:
+#         filename = os.path.relpath(filename)
+#         if not os.path.exists(filename):
+#             print("{red}Path '{f}' does not exist.{reset}\n".format(
+#                 f=filename, red=colorama.Fore.RED,
+#                 reset=colorama.Style.RESET_ALL))
+#             continue
+#         print("{green}Path '{f}':{reset}".format(
+#             f=filename, green=colorama.Fore.GREEN,
+#             reset=colorama.Style.RESET_ALL))
+#
+#         try:
+#             info = comm.query.what_is(filename)
+#         except LASIFError as e:
+#             info = "Error: %s" % e.message
+#
+#         print("\t" + info)
+#         print("")
 
-    parser.add_argument("--nobrowser", help="Do not open a webbrowser.",
-                        action="store_true")
-    parser.add_argument("--debug", help="Turn on debugging. Implies "
-                                        "'--nobrowser'.",
-                        action="store_true")
-    parser.add_argument(
-        "--open_to_outside",
-        help="By default the website can only be opened from the current "
-             "computer. Use this argument to access it from any other "
-             "computer on the network.",
-        action="store_true")
-    args = parser.parse_args(args)
-    port = args.port
-    nobrowser = args.nobrowser
-    debug = args.debug
-    open_to_outside = args.open_to_outside
 
-    if debug:
-        nobrowser = True
-
-    comm = _find_project_comm(".")
-
-    if nobrowser is False:
-        import webbrowser
-        import threading
-
-        threading.Timer(
-            1.0, lambda: webbrowser.open("http://localhost:%i" % port)).start()
-
-    from lasif.webinterface.server import serve
-    serve(comm, port=port, debug=debug, open_to_outside=open_to_outside)
+# @command_group("Misc")
+# def lasif_serve(parser, args):
+#     """
+#     Launches the LASIF webinterface.
+#     """
+#     parser.add_argument("--port", default=8008, type=int,
+#                         help="Port of the webserver.")
+#
+#     parser.add_argument("--nobrowser", help="Do not open a webbrowser.",
+#                         action="store_true")
+#     parser.add_argument("--debug", help="Turn on debugging. Implies "
+#                                         "'--nobrowser'.",
+#                         action="store_true")
+#     parser.add_argument(
+#         "--open_to_outside",
+#         help="By default the website can only be opened from the current "
+#              "computer. Use this argument to access it from any other "
+#              "computer on the network.",
+#         action="store_true")
+#     args = parser.parse_args(args)
+#     port = args.port
+#     nobrowser = args.nobrowser
+#     debug = args.debug
+#     open_to_outside = args.open_to_outside
+#
+#     if debug:
+#         nobrowser = True
+#
+#     comm = _find_project_comm(".")
+#
+#     if nobrowser is False:
+#         import webbrowser
+#         import threading
+#
+#         threading.Timer(
+#             1.0, lambda: webbrowser.open("http://localhost:%i" % port)).start()
+#
+#     from lasif.webinterface.server import serve
+#     serve(comm, port=port, debug=debug, open_to_outside=open_to_outside)
 
 
 def _get_cmd_description(fct):

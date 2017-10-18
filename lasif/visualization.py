@@ -26,8 +26,7 @@ def plot_events(events, map_object, beachball_size=0.02):
         # Add beachball plot.
         x, y = map_object(event["longitude"], event["latitude"])
 
-        focmec = [event["m_rr"], event["m_tt"], event["m_pp"], event["m_rt"],
-                  event["m_rp"], event["m_tp"]]
+        focmec = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0]
         # Attempt to calculate the best beachball size.
         width = max((map_object.xmax - map_object.xmin,
                      map_object.ymax - map_object.ymin)) * beachball_size
@@ -228,10 +227,12 @@ def plot_stations_for_event(map_object, station_dict, event_info,
                 event_info["longitude"], event_info["latitude"], sta_lng,
                 sta_lat, lw=2, alpha=0.3)
 
-    title = "Event in %s, at %s, %.1f Mw, with %i stations." % (
-        event_info["region"], re.sub(
-            r":\d{2}\.\d{6}Z", "", str(event_info["origin_time"])),
-        event_info["magnitude"], len(station_dict))
+    # title = "Event in %s, at %s, %.1f Mw, with %i stations." % (
+    #     event_info["region"], re.sub(
+    #         r":\d{2}\.\d{6}Z", "", str(event_info["origin_time"])),
+    #     event_info["magnitude"], len(station_dict))
+    title = "Event in %s, with %i stations." % (
+        event_info["region"], len(station_dict))
     map_object.ax.set_title(title, size="large")
     return stations
 
